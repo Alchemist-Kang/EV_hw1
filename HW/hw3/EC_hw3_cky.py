@@ -67,7 +67,7 @@ class EV1_Config:
 #Simple 1-D fitness function example
 #Now changing to a more complicated function
 def fitnessFunc(x):
-    return -10 - (0.04*x)*(0.04*x) + 10*np.cos(0.04*np.pi*x)
+    return -10 -(0.04*x)*(0.04*x) + 10*np.cos(0.04*np.pi*x)
 
 
 #Find index of worst individual in population
@@ -97,9 +97,12 @@ def printStats(pop,gen):
 # Find Maximum Value and Return it
 def maximum(pop,gen):
     max1=pop[0].fit
+    state_v=pop[0].x
     for p in pop:
-        if p.fit > max1: max1=p.fit
-    return max1
+        if p.fit > max1:
+            max1=p.fit
+            state_v=p.x
+    return max1, state_v
 
 #Find Average Value and Return it
 def avg_value(pop,gen):
@@ -137,7 +140,9 @@ def ev1(cfg):
     # start random number generator         setting prng(pseudo random number generator) as Random()
     prng=Random()
     prng.seed(cfg.randomSeed)
+    maxlist=[]
     best_list=[]
+    state_values=[]
     average_list=[]
     std_list=[]
 
@@ -151,7 +156,9 @@ def ev1(cfg):
         
     #print stats    
     printStats(population,0)
-    best_list.append(maximum(population,0))
+    maxlist = maximum(population,0)
+    best_list.append(maxlist[0])
+    state_values.append(maxlist[1])
     average_list.append(avg_value(population,0))
     std_list.append(std_values(population,0))
     
@@ -177,7 +184,9 @@ def ev1(cfg):
         
         #print stats    
         printStats(population,i+1)
-        best_list.append(maximum(population,i+1))
+        maxlist = maximum(population,i+1)
+        best_list.append(maxlist[0])
+        state_values.append(maxlist[1])
         average_list.append(avg_value(population,i+1))
         std_list.append(std_values(population,i+1))
         
@@ -185,8 +194,10 @@ def ev1(cfg):
 
     #Plot Best fitness and state values  vs. generation count
     gcount = np.arange(0,51,1)
-    plt.plot(gcount, best_list, linewidth=5, color="g")
-    plt.title("Best_fitness vs generation coount")
+    plt.plot(gcount, best_list, linewidth=5, color="g", label = "BestFitness")
+    plt.plot(gcount, state_values, linewidth=5, color="b", label = "State_values")
+    plt.legend()
+    plt.title("Best_fitness_and_State_value vs generation count")
     plt.savefig("Best_fitness_vs_gcount.png")
     plt.show()
 
@@ -251,7 +262,7 @@ if __name__ == '__main__':
 
 # Plot the Fitness function
 x = np.arange(-100,100,1)
-y = -10 - (0.04*x)*(0.04*x) + 10*np.cos(0.04*np.pi*x)
+y = -10 -(0.04*x)*(0.04*x) + 10*np.cos(0.04*np.pi*x)
 plt.plot(x,y , linewidth=5, color="r")
 plt.title("Fitness Function")
 plt.savefig("Fitness_Function.png")
