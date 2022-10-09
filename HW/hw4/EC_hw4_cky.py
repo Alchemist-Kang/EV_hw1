@@ -138,26 +138,26 @@ class Individual:
         return Individual(childx,fitnessFunc(childx))
     
     def mutate(self):
+        #Claulate the sigma' of previous generation
         x_list=[]
-        mutation_list=[]
         for p in self:
             x_list.append(p.x)
-        original_std=np.std(x_list,ddof=1)
+        original_std=np.std(x_list[:10],ddof=1) #Only the first 10 people be calculated into sigma
         tau = 1/(len(x_list)**(1/2))
         N = np.random.normal(0,1)
         new_std=original_std*np.exp(tau*N)
-        if new_std > 2.0:
-            new_std = 2.0
-        elif new_std < -2.0:
-            new_std = -2.0
+        if new_std > 3.0:
+            new_std = 3.0
+        elif new_std < -3.0:
+            new_std = -3.0
         else:
             new_std = new_std
 
-        for p in self:
-            p.x = p.x + new_std*N
-            mutation_list.append(p.x)
+        #For new child it'll mutate 
+        self[-1] = Individual(self[-1].x + new_std*N,fitnessFunc(self[-1].x + new_std*N))   #The newest one in the list will get mutated
         
-        return mutation_list
+        
+        return self
 
 
 #EV1: The simplest EA ever!
@@ -193,13 +193,12 @@ def ev1(cfg):
 
     #evolution main loop
     for i in range(cfg.generationCount):    #Do for i=0 ~ 49
-        #self-adaptive mutation
-        Individual.mutate(population)
-        
+   
         for j in range(5):
             parents=prng.sample(population,2)       #Randomly choose 2 parents each time while generatie a child
-            child=Individual.crossover(parents[0].x,parents[1].x)   #Create 1 children 
-            population.append(child)
+            child=Individual.crossover(parents[0].x,parents[1].x)   #Create 1 children by crossover
+            population.append(child)                              #Temporary add that child to population
+            population=Individual.mutate(population)              #Then Mutate the new born child  with previous generation sigma (self-adaptive)
 
         
         
