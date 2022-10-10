@@ -142,7 +142,7 @@ class Individual:
         x_list=[]
         for p in self:
             x_list.append(p.x)
-        original_std=np.std(x_list[:10],ddof=1) #Only the first 10 people be calculated into sigma
+        original_std=np.std(x_list,ddof=1) #Only the first 10 people be calculated into sigma
         tau = 1/(len(x_list)**(1/2))
         N = np.random.normal(0,1)
         new_std=original_std*np.exp(tau*N)
@@ -152,11 +152,8 @@ class Individual:
             new_std = -3.0
         else:
             new_std = new_std
-
-        #For new child it'll mutate 
-        self[-1] = Individual(self[-1].x + new_std*N,fitnessFunc(self[-1].x + new_std*N))   #The newest one in the list will get mutated
-        
-        
+        for i in range(len(x_list)):
+            self[i] = Individual((self[i].x)+new_std*N,fitnessFunc((self[i].x)+new_std*N))
         return self
 
 
@@ -198,7 +195,8 @@ def ev1(cfg):
             parents=prng.sample(population,2)       #Randomly choose 2 parents each time while generatie a child
             child=Individual.crossover(parents[0].x,parents[1].x)   #Create 1 children by crossover
             population.append(child)                              #Temporary add that child to population
-            population=Individual.mutate(population)              #Then Mutate the new born child  with previous generation sigma (self-adaptive)
+        
+        population[10:] = Individual.mutate(population[10:])
 
         
         
